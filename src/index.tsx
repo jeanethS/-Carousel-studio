@@ -1,0 +1,173 @@
+import { execFile } from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as crypto from 'crypto';
+import yaml from 'yaml';
+import { findBestPhotoForTopic } from './photos/matcher';
+import { renderTemplateToSvg } from './render/satori';
+import { rasterizeSvgToPng } from './render/sharp';
+import { InstagramSlide } from './templates/instagram/slide';
+import { ReactNode } from 'react';
+
+// Define types based on TRD
+export interface CarouselSlide {
+  slideNumber: number;
+  headline: string;
+  bodyText?: string;
+  dataPoint?: string;
+  visualCue?: string;
+}
+
+export interface RoutedJobEvent {
+  jobId: string;
+  clusterId: string;
+  topic: string;
+  platform: 'instagram' | 'linkedin';
+  hookHeadline: string;
+  founderPositioning?: string;
+  slides: CarouselSlide[];
+  ctaText: string;
+  handleOrProfile: string;
+}
+
+/**
+ * Simple JSON logger for stages.
+ */
+function logStage(jobId: string, stage: string, status: 'start' | 'ok' | 'error', extra: Record<string, any> = {}): void {
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    jobId,
+    stage,
+    status,
+    ...extra,
+  }));
+}
+
+/**
+ * Computes a SHA-256 fingerprint of the job's slide content.
+ */
+function computeFingerprint(job: RoutedJobEvent): string {
+  const hash = crypto.createHash('sha256');
+  // Include topic and all slide fields that affect rendering
+  hash.update(job.topic);
+  for (const slide of job.slides) {
+    hash.update(slide.slideNumber.toString());
+    hash.update(slide.headline);
+    hash.update(slide.bodyText ?? '');
+    hash.update(slide.dataPoint ?? '');
+    hash.update(slide.visualCue ?? '');
+  }
+  return hash.update(JSON.stringify(job)).digest('hex');
+}
+
+/**
+ * Checks whether a given cluster+fingerprint pair is a duplicate.
+ * Spawns `python path/to/dedup_service.py <clusterId> <fingerprint>` and
+ * parses stdout for `{duplicate: boolean}`.
+ *
+ * @returns `true` when the job is NOT a duplicate (ok to proceed),
+ *          `false` when it IS a duplicate (skip generation).
+ */
+export async function passesDeduplicationCheck(
+  clusterId: string,
+  fingerprint: string
+): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+    execFile(
+      'python',
+      ['path/to/dedup_service.py', clusterId, fingerprint],
+      (error, stdout) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        let parsed: { duplicate: boolean };
+        try {
+          parsed = JSON.parse(stdout);
+        } catch {
+          reject(new Error(`Failed to parse dedup service output: ${stdout}`));
+          return;
+        }
+
+        // Returns true (passes) when NOT a duplicate, false when IS a duplicate
+        resolve(!parsed.duplicate);
+      }
+    );
+  });
+}
+
+/**
+ * Orchestrates the carousel generation pipeline for a single job.
+ * Steps:
+ *   1. Deduplication check
+ *   2. Photo matching (Gemini Vision)
+ *   3. Gradient fallback logic (if no matching photo)
+ *   4. Slide rendering (Satori + Sharp)
+ *   5. Output writing
+ */
+export async function bootstrapCarouselStudio(job: RoutedJobEvent): Promise<void> {
+  const startTime = Date.now();
+  logStage(job.jobId, 'dedup', 'start');
+
+  const fingerprint = computeFingerprint(job);
+  const isDuplicate = !(await passesDeduplicationCheck(job.clusterId, fingerprint));
+  if (isDuplicate) {
+    logStage(job.jobId, 'dedup', 'ok', { duplicate: true });
+    // Exit early, no output generated
+    return;
+  }
+  logStage(job.jobId, 'dedup', 'ok', { duplicate: false });
+
+  logStage(job.jobId, 'matcher', 'start');
+  let bestPhoto: string | null = null;
+  try {
+    bestPhoto = await findBestPhotoForTopic(job.topic);
+  } catch (err) {
+    // If matcher fails, treat as no photo and fallback to gradient
+    // Log generic message to avoid leaking sensitive info (US-07)
+    if (process.env.DEBUG) {
+      console.error(`Matcher error: ${err}`);
+    } else {
+      console.error('Gemini request failed');
+    }
+    bestPhoto = null;
+  }
+  logStage(job.jobId, 'matcher', 'ok', { bestPhoto: bestPhoto ?? null });
+
+  // Load Instagram design tokens (gradient fallback config)
+  const igConfigPath = path.join(process.cwd(), 'config', 'ig-design.yaml');
+  const igConfigRaw = await fs.promises.readFile(igConfigPath, 'utf8');
+  const igConfig = yaml.parse(igConfigRaw) as any;
+
+  const heroImageUrl = bestPhoto ?? undefined;
+  const fallbackGradientIndex = heroImageUrl == null ? 0 : undefined; // use first gradient if no hero
+
+  // Prepare output directory
+  const outputDir = path.join(process.cwd(), 'output', `${job.platform}_${job.jobId}`);
+  await fs.promises.mkdir(outputDir, { recursive: true });
+
+  logStage(job.jobId, 'satori', 'start');
+  logStage(job.jobId, 'sharp', 'start');
+
+  // Process each slide sequentially (could be parallelized later)
+  for (const slide of job.slides) {
+    const svg = await renderTemplateToSvg(
+      // JSX element
+      <InstagramSlide
+        config={igConfig}
+        slide={slide}
+        heroImageUrl={heroImageUrl}
+        fallbackGradientIndex={fallbackGradientIndex}
+      />,
+      { width: igConfig.slide.width, height: igConfig.slide.height }
+    );
+
+    const outputPath = path.join(outputDir, `slide_${String(slide.slideNumber).padStart(2, '0')}.png`);
+    await rasterizeSvgToPng(svg, outputPath);
+  }
+
+  logStage(job.jobId, 'sharp', 'ok');
+  logStage(job.jobId, 'satori', 'ok');
+  logStage(job.jobId, 'orchestrator', 'ok', { durationMs: Date.now() - startTime });
+}

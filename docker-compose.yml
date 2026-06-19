@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  carousel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carousel-studio
+    volumes:
+      - ./output:/app/output
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - NODE_ENV=production
+    command: ["tail", "-f", "/dev/null"]

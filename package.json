@@ -1,0 +1,36 @@
+{
+  "name": "carousel-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deterministic headless carousel rendering pipeline for Instagram and LinkedIn",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "jest --coverage",
+    "task:dedup": "npm run build && node -r ts-node/register src/tasks/dedup.ts",
+    "task:matcher": "npm run build && node -r ts-node/register src/tasks/matcher.ts",
+    "task:satori": "npm run build && node -r ts-node/register src/tasks/satori.ts",
+    "task:sharp": "npm run build && node -r ts-node/register src/tasks/sharp.ts",
+    "task:orchestrator": "npm run build && node -r ts-node/register src/index.ts",
+    "task:watch": "node src/utils/watch.js",
+    "task:all": "npm run task:dedup && npm run task:matcher && npm run task:satori && npm run task:sharp && npm run task:orchestrator",
+    "bench": "node src/bench/benchmark.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "js-yaml": "^4.2.0",
+    "react": "^18.2.0",
+    "satori": "^0.26.0",
+    "sharp": "^0.35.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.3.7",
+    "@types/yaml": "^1.9.6",
+    "jest": "^29.7.0",
+    "react-dom": "^18.3.1",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
