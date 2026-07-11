@@ -16,6 +16,7 @@
     "bench": "node src/bench/benchmark.js"
   },
   "dependencies": {
+    "@brand-os/contracts": "file:../brand-os-infra/contracts",
     "@google/generative-ai": "^0.24.1",
     "js-yaml": "^4.2.0",
     "react": "^18.2.0",
