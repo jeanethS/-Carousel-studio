@@ -1,4 +1,4 @@
-import { passesDeduplicationCheck } from './index';
+import { passesDeduplicationCheck, bootstrapCarouselStudio } from './index';
 import { execFile } from 'child_process';
 
 jest.mock('child_process');
@@ -59,5 +59,42 @@ describe('passesDeduplicationCheck', () => {
     });
 
     await expect(passesDeduplicationCheck(clusterId, fingerprint)).rejects.toThrow();
+  });
+});
+
+describe('bootstrapCarouselStudio boundary validation', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('rejects an invalid payload (bad platform) before any I/O', async () => {
+    const invalid = {
+      jobId: 'x',
+      clusterId: 'c',
+      topic: 't',
+      platform: 'tiktok', // unsupported
+      hookHeadline: 'h',
+      slides: [{ slideNumber: 1, headline: 's' }],
+      ctaText: 'c',
+      handleOrProfile: '@x',
+    };
+    await expect(bootstrapCarouselStudio(invalid as never)).rejects.toThrow();
+    // Validation runs first — dedup must NOT have been reached.
+    expect(execFileMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects an empty slides array before any I/O', async () => {
+    const invalid = {
+      jobId: 'x',
+      clusterId: 'c',
+      topic: 't',
+      platform: 'instagram',
+      hookHeadline: 'h',
+      slides: [],
+      ctaText: 'c',
+      handleOrProfile: '@x',
+    };
+    await expect(bootstrapCarouselStudio(invalid as never)).rejects.toThrow();
+    expect(execFileMock).not.toHaveBeenCalled();
   });
 });

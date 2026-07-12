@@ -8,27 +8,10 @@ import { renderTemplateToSvg } from './render/satori';
 import { rasterizeSvgToPng } from './render/sharp';
 import { InstagramSlide } from './templates/instagram/slide';
 import { ReactNode } from 'react';
+import { RoutedJobEventSchema, type CarouselSlide, type RoutedJobEvent } from './contracts/routed_job';
 
-// Define types based on TRD
-export interface CarouselSlide {
-  slideNumber: number;
-  headline: string;
-  bodyText?: string;
-  dataPoint?: string;
-  visualCue?: string;
-}
-
-export interface RoutedJobEvent {
-  jobId: string;
-  clusterId: string;
-  topic: string;
-  platform: 'instagram' | 'linkedin';
-  hookHeadline: string;
-  founderPositioning?: string;
-  slides: CarouselSlide[];
-  ctaText: string;
-  handleOrProfile: string;
-}
+// Types re-exported from the validated contract (single source of truth).
+export type { CarouselSlide, RoutedJobEvent };
 
 /**
  * Simple JSON logger for stages.
@@ -107,22 +90,25 @@ export async function passesDeduplicationCheck(
  *   5. Output writing
  */
 export async function bootstrapCarouselStudio(job: RoutedJobEvent): Promise<void> {
-  const startTime = Date.now();
-  logStage(job.jobId, 'dedup', 'start');
+  // Validate at the boundary — reject malformed payloads before any I/O.
+  const parsed = RoutedJobEventSchema.parse(job);
 
-  const fingerprint = computeFingerprint(job);
-  const isDuplicate = !(await passesDeduplicationCheck(job.clusterId, fingerprint));
+  const startTime = Date.now();
+  logStage(parsed.jobId, 'dedup', 'start');
+
+  const fingerprint = computeFingerprint(parsed);
+  const isDuplicate = !(await passesDeduplicationCheck(parsed.clusterId, fingerprint));
   if (isDuplicate) {
-    logStage(job.jobId, 'dedup', 'ok', { duplicate: true });
+    logStage(parsed.jobId, 'dedup', 'ok', { duplicate: true });
     // Exit early, no output generated
     return;
   }
-  logStage(job.jobId, 'dedup', 'ok', { duplicate: false });
+  logStage(parsed.jobId, 'dedup', 'ok', { duplicate: false });
 
-  logStage(job.jobId, 'matcher', 'start');
+  logStage(parsed.jobId, 'matcher', 'start');
   let bestPhoto: string | null = null;
   try {
-    bestPhoto = await findBestPhotoForTopic(job.topic);
+    bestPhoto = await findBestPhotoForTopic(parsed.topic);
   } catch (err) {
     // If matcher fails, treat as no photo and fallback to gradient
     // Log generic message to avoid leaking sensitive info (US-07)
@@ -133,7 +119,7 @@ export async function bootstrapCarouselStudio(job: RoutedJobEvent): Promise<void
     }
     bestPhoto = null;
   }
-  logStage(job.jobId, 'matcher', 'ok', { bestPhoto: bestPhoto ?? null });
+  logStage(parsed.jobId, 'matcher', 'ok', { bestPhoto: bestPhoto ?? null });
 
   // Load Instagram design tokens (gradient fallback config)
   const igConfigPath = path.join(process.cwd(), 'config', 'ig-design.yaml');
@@ -144,14 +130,14 @@ export async function bootstrapCarouselStudio(job: RoutedJobEvent): Promise<void
   const fallbackGradientIndex = heroImageUrl == null ? 0 : undefined; // use first gradient if no hero
 
   // Prepare output directory
-  const outputDir = path.join(process.cwd(), 'output', `${job.platform}_${job.jobId}`);
+  const outputDir = path.join(process.cwd(), 'output', `${parsed.platform}_${parsed.jobId}`);
   await fs.promises.mkdir(outputDir, { recursive: true });
 
-  logStage(job.jobId, 'satori', 'start');
-  logStage(job.jobId, 'sharp', 'start');
+  logStage(parsed.jobId, 'satori', 'start');
+  logStage(parsed.jobId, 'sharp', 'start');
 
   // Process each slide sequentially (could be parallelized later)
-  for (const slide of job.slides) {
+  for (const slide of parsed.slides) {
     const svg = await renderTemplateToSvg(
       // JSX element
       <InstagramSlide
@@ -167,7 +153,7 @@ export async function bootstrapCarouselStudio(job: RoutedJobEvent): Promise<void
     await rasterizeSvgToPng(svg, outputPath);
   }
 
-  logStage(job.jobId, 'sharp', 'ok');
-  logStage(job.jobId, 'satori', 'ok');
-  logStage(job.jobId, 'orchestrator', 'ok', { durationMs: Date.now() - startTime });
+  logStage(parsed.jobId, 'sharp', 'ok');
+  logStage(parsed.jobId, 'satori', 'ok');
+  logStage(parsed.jobId, 'orchestrator', 'ok', { durationMs: Date.now() - startTime });
 }
