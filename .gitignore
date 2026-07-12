@@ -16,3 +16,9 @@ output/
 *.tmp
 *.swp
 *~
+
+# GCP / service-account secrets (never commit)
+gcp-service-account*.json
+*service-account*.json
+*-sa.json
+*.key
