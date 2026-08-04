@@ -1,0 +1,62 @@
+{
+  "jobId": "agent-security-pythoncdmx",
+  "clusterId": "agentic-security",
+  "topic": "Seguridad de agentes de IA con tools externos y sistemas multiagente",
+  "platform": "linkedin",
+  "hookHeadline": "Tu agente no se vuelve peligroso cuando piensa. Se vuelve peligroso cuando puede actuar.",
+  "founderPositioning": "Una lectura de seguridad después de Python CDMX",
+  "slides": [
+    {
+      "slideNumber": 1,
+      "headline": "Tu agente no se vuelve peligroso cuando piensa",
+      "bodyText": "Se vuelve peligroso cuando puede actuar.",
+      "visualCue": "Seguridad en la era de los agentes"
+    },
+    {
+      "slideNumber": 2,
+      "headline": "Misma interfaz. Distinto radio de impacto.",
+      "bodyText": "Buscar en un JSON local y controlar Spotify parecen tools equivalentes para el modelo. Para seguridad, no lo son.",
+      "visualCue": "local → API externa"
+    },
+    {
+      "slideNumber": 3,
+      "headline": "El riesgo no vive solo en el modelo",
+      "dataPoint": "riesgo = tools × permisos × autonomía",
+      "bodyText": "Una respuesta incorrecta es molesta. Una acción incorrecta puede modificar datos, gastar dinero o exponer información.",
+      "visualCue": "OWASP: Excessive Agency"
+    },
+    {
+      "slideNumber": 4,
+      "headline": "OAuth no es configuración",
+      "dataPoint": "Es arquitectura de seguridad.",
+      "bodyText": "Separa lectura y escritura. Entrega el mínimo scope. Usa credenciales temporales. Revoca lo que ya no se necesita.",
+      "visualCue": "least privilege"
+    },
+    {
+      "slideNumber": 5,
+      "headline": "Multiagente = más fronteras de confianza",
+      "bodyText": "Cada agente delegado recibe contexto y capacidades. Limita sus tools por rol y trata sus mensajes como entrada no confiable.",
+      "visualCue": "delegar ≠ confiar"
+    },
+    {
+      "slideNumber": 6,
+      "headline": "Antes de una acción sensible, exige fricción",
+      "bodyText": "Previsualiza. Confirma intención. Haz la operación idempotente. Conserva un registro. Diseña cómo revertirla.",
+      "visualCue": "human in the loop"
+    },
+    {
+      "slideNumber": 7,
+      "headline": "La defensa que casi nadie menciona: menos contexto",
+      "bodyText": "No subas todo tu workspace. Recupera solo lo necesario. Por eso construyo mnemo: contexto relacional local-first para clientes MCP.",
+      "visualCue": "mnemo · privacidad por diseño"
+    },
+    {
+      "slideNumber": 8,
+      "headline": "Cada capability nueva necesita un control nuevo",
+      "bodyText": "Diseña permisos antes que prompts. ¿Qué puede hacer hoy tu agente que todavía no sabes auditar o revertir?",
+      "visualCue": "Guárdalo para tu próximo agente"
+    }
+  ],
+  "ctaText": "¿Qué control le falta hoy a tu agente?",
+  "handleOrProfile": "mnemo"
+}

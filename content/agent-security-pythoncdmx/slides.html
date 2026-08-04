@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Security Carousel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --bg-elevated: #14171b;
+      --text-primary: #f4f5f7;
+      --text-dim: #9aa3ad;
+      --accent: #35e0c0;
+      --glass-bg: rgba(20,23,27,0.55);
+      --glass-border: rgba(255,255,255,0.14);
+      --radius: 20px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      background: var(--bg);
+      font-family: 'Sora', sans-serif;
+      color: var(--text-primary);
+    }
+
+    body {
+      padding: 0;
+      margin: 0;
+    }
+
+    .carousel {
+      display: block;
+      width: 100%;
+    }
+
+    .slide {
+      position: relative;
+      width: 1080px;
+      height: 1350px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+      page-break-after: always;
+      break-after: page;
+    }
+
+    /* Photo slide styles */
+    .slide.photo {
+      justify-content: flex-end;
+    }
+
+    .slide.photo .photo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    /* Two-photo collage cover: top/bottom split with a hairline seam */
+    .slide.collage .photo-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 57%;
+      object-fit: cover;
+      object-position: center 32%;
+      z-index: 1;
+    }
+
+    .slide.collage .photo-bottom {
+      position: absolute;
+      top: calc(57% + 3px);
+      left: 0;
+      width: 100%;
+      height: calc(43% - 3px);
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .slide.collage .seam {
+      position: absolute;
+      top: 57%;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--bg);
+      z-index: 2;
+    }
+
+    .slide.photo .scrim {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(11,13,16,0.95), rgba(11,13,16,0.35) 55%, rgba(11,13,16,0.15));
+      z-index: 2;
+    }
+
+    .slide.photo .content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      flex-grow: 1;
+      padding: 80px 48px 48px;
+    }
+
+    /* Text-only slide styles */
+    .slide.text-only {
+      justify-content: center;
+      position: relative;
+    }
+
+    .slide.text-only .aura {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 20%, rgba(53,224,192,0.18), transparent 60%);
+      z-index: 1;
+    }
+
+    .slide.text-only .content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      padding: 80px 120px 120px 80px;
+    }
+
+    /* Glass card */
+    .glass {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 48px;
+      backdrop-filter: blur(18px);
+      width: fit-content;
+      max-width: 600px;
+    }
+
+    .glass.glass-wide {
+      max-width: 760px;
+    }
+
+    .slide.text-only .glass {
+      background: transparent;
+      border: none;
+      padding: 0;
+      backdrop-filter: none;
+      max-width: none;
+      width: auto;
+    }
+
+    /* Kicker */
+    .kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    /* Headlines */
+    .slide h2 {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 52px;
+      line-height: 1.15;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .slide.text-only h2 {
+      font-size: 48px;
+    }
+
+    /* Body text */
+    .slide .body {
+      font-family: 'Sora', sans-serif;
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 1.5;
+      color: var(--text-dim);
+      display: block;
+      margin: 0;
+    }
+
+    .slide.text-only .body {
+      font-size: 18px;
+      margin-bottom: 0;
+    }
+
+    /* Body for closing slide */
+    .slide.closing .body-main {
+      font-size: 20px;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      display: block;
+    }
+
+    .cta {
+      font-family: 'Sora', sans-serif;
+      font-weight: 600;
+      font-size: 32px;
+      color: var(--accent);
+      line-height: 1.4;
+      display: block;
+      margin-top: 32px;
+    }
+
+    /* Inline diagram, sits below the body copy inside the text stack */
+    .slide.text-only .diagram {
+      display: block;
+      margin-top: 40px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Tutorial action line: the concrete, code-flavored step under the body copy */
+    .slide .action {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      display: block;
+      margin-top: 20px;
+      padding-left: 16px;
+      border-left: 2px solid var(--accent);
+    }
+
+    .slide .action code {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Best-practice list: multi-line tutorial steps under the body copy */
+    .practice {
+      margin-top: 20px;
+      padding-left: 16px;
+      border-left: 2px solid var(--accent);
+    }
+
+    .practice-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .practice ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .practice li {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    .practice li code {
+      color: var(--accent);
+    }
+
+    /* Terminal-style code block, for slides that show an actual snippet */
+    .code-block {
+      margin-top: 24px;
+      background: #05070a;
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      overflow: hidden;
+      width: fit-content;
+      max-width: 100%;
+    }
+
+    .code-block .code-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .code-block .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      opacity: 0.4;
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 20px 22px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-primary);
+      white-space: pre;
+    }
+
+    .code-block .kw { color: var(--accent); }
+    .code-block .cm { color: var(--text-dim); }
+    .code-block .st { color: #f4f5f7; }
+
+    /* Closing checklist */
+    .checklist {
+      list-style: none;
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .checklist li {
+      font-family: 'Sora', sans-serif;
+      font-size: 18px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .checklist li::before {
+      content: "✓";
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Footer */
+    .footer {
+      position: absolute;
+      bottom: 32px;
+      left: 48px;
+      right: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      font-size: 12px;
+      color: var(--text-dim);
+      z-index: 10;
+      width: calc(100% - 96px);
+    }
+
+    .footer-left {
+      letter-spacing: 1px;
+    }
+
+    .footer-right {
+      letter-spacing: 1px;
+    }
+
+    .dark-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 2;
+    }
+
+    .swipe {
+      position: absolute;
+      bottom: 32px;
+      right: 48px;
+      z-index: 10;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="carousel">
+    <!-- Slide 1: Collage cover (facade2 + tower) -->
+    <div class="slide photo collage">
+      <img src="img/facade2.jpg" class="photo-top" alt="Slide 1 top">
+      <div class="seam"></div>
+      <img src="img/tower.jpg" class="photo-bottom" alt="Slide 1 bottom">
+      <div class="scrim"></div>
+      <div class="dark-overlay"></div>
+      <div class="content">
+        <div class="glass">
+          <span class="kicker">SEGURIDAD EN AGENTES DE IA · DE LA TEORÍA A LA PRÁCTICA</span>
+          <h2>Un agente no se vuelve peligroso cuando piensa.</h2>
+          <p class="body">Se vuelve peligroso cuando puede actuar. Ya aplicaba varias de estas prácticas, pero una charla de Python CDMX me dejó patrones más concretos para blindar tools y servidores MCP, los que ahora estoy afinando en katsi.</p>
+        </div>
+      </div>
+      <div class="swipe">Desliza →</div>
+      <div class="footer">
+        <span class="footer-left">@katsi</span>
+        <span class="footer-right">01 / 08</span>
+      </div>
+    </div>
+
+    <!-- Slide 2: Facade photo -->
+    <div class="slide photo">
+      <img src="img/aerial2.jpg" class="photo" alt="Slide 2">
+      <div class="scrim"></div>
+      <div class="content">
+        <div class="glass glass-wide">
+          <span class="kicker">PASO 1 · CLASIFICACIÓN DE RIESGO Y VALIDACIÓN</span>
+          <h2>Local vs API externa. No todas las tools son iguales.</h2>
+          <p class="body">Para el LLM, leer un JSON local y ejecutar un webhook externo son solo llamadas a funciones. Para tu arquitectura, el radio de impacto es radicalmente distinto.</p>
+          <div class="code-block">
+            <div class="code-titlebar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <pre><span class="st">RISK</span> = {<span class="st">"read_file"</span>: <span class="st">"LOW"</span>, <span class="st">"spotify.play"</span>: <span class="st">"HIGH"</span>}
+
+<span class="kw">def</span> call_tool(name, args):
+    validate(args, SCHEMAS[name])
+    <span class="kw">if</span> RISK[name] == <span class="st">"HIGH"</span>:
+        rate_limit(name)
+    <span class="kw">return</span> TOOLS[name](**args)</pre>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <span class="footer-left">@katsi</span>
+        <span class="footer-right">02 / 08</span>
+      </div>
+    </div>
+
+    <!-- Slide 3: Text-only with tools/permisos/autonomia SVG -->
+    <div class="slide text-only slide-3">
+      <div class="aura"></div>
+      <div class="content">
+        <div class="glass">
+          <span class="kicker">OWASP TOP 10 LLM · EXCESSIVE AGENCY</span>
+          <h2>El riesgo no vive en la alucinación. Vive en la ejecución.</h2>
+          <p class="body">Una respuesta incorrecta es molesta. Una acción incorrecta borra datos, gasta dinero o expone secretos.</p>
+          <svg class="diagram" width="480" height="140" viewBox="0 0 480 140" xmlns="http://www.w3.org/2000/svg">
+            <!-- First circle and label -->
+            <circle cx="60" cy="80" r="28" fill="none" stroke="#35e0c0" stroke-width="2"/>
+            <text x="60" y="35" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#9aa3ad" text-anchor="middle">tools</text>
+
+            <!-- Multiplication sign 1 -->
+            <text x="150" y="90" font-family="Sora" font-size="24" font-weight="600" fill="#35e0c0" text-anchor="middle">×</text>
+
+            <!-- Second circle and label -->
+            <circle cx="240" cy="80" r="28" fill="none" stroke="#35e0c0" stroke-width="2"/>
+            <text x="240" y="35" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#9aa3ad" text-anchor="middle">permisos</text>
+
+            <!-- Multiplication sign 2 -->
+            <text x="330" y="90" font-family="Sora" font-size="24" font-weight="600" fill="#35e0c0" text-anchor="middle">×</text>
+
+            <!-- Third circle and label -->
+            <circle cx="420" cy="80" r="28" fill="none" stroke="#35e0c0" stroke-width="2"/>
+            <text x="420" y="35" font-family="JetBrains Mono" font-size="13" font-weight="500" fill="#35e0c0" text-anchor="middle">autonomía</text>
+          </svg>
+          <div class="practice">
+            <span class="practice-label">Best practice</span>
+            <ul>
+              <li>Presupuesto de acción: <code>max_iterations=5</code> por sesión.</li>
+              <li>Sanitiza la salida de cada tool antes de devolverla al modelo, evita prompt injection inverso.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <span class="footer-left">@katsi</span>
+        <span class="footer-right">03 / 08</span>
+      </div>
+    </div>
+
+    <!-- Slide 4: Text-only with permission scope diagram -->
+    <div class="slide text-only slide-4">
+      <div class="aura"></div>
+      <div class="content">
+        <div class="glass">
+          <span class="kicker">PASO 3 · MÍNIMO PRIVILEGIO (JIT)</span>
+          <h2>OAuth es arquitectura, no solo configuración.</h2>
+          <p class="body">Las variables de entorno estáticas con acceso total son una bomba de tiempo en agentes autónomos.</p>
+          <svg class="diagram" width="420" height="100" viewBox="0 0 420 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Outer container -->
+            <rect x="10" y="40" width="400" height="40" rx="10" fill="none" stroke="#9aa3ad" stroke-width="1" opacity="0.5"/>
+
+            <!-- Wide segment -->
+            <rect x="20" y="48" width="160" height="24" rx="6" fill="none" stroke="#9aa3ad" stroke-width="1.5"/>
+            <text x="100" y="67" font-family="JetBrains Mono" font-size="11" font-weight="500" fill="#9aa3ad" text-anchor="middle">wide</text>
+
+            <!-- Narrow segment -->
+            <rect x="200" y="48" width="110" height="24" rx="6" fill="none" stroke="#9aa3ad" stroke-width="1.5"/>
+            <text x="255" y="67" font-family="JetBrains Mono" font-size="11" font-weight="500" fill="#9aa3ad" text-anchor="middle">narrow</text>
+
+            <!-- Minimum segment (highlighted) -->
+            <rect x="330" y="48" width="70" height="24" rx="6" fill="none" stroke="#35e0c0" stroke-width="2.5"/>
+            <text x="365" y="67" font-family="JetBrains Mono" font-size="11" font-weight="500" fill="#35e0c0" text-anchor="middle">min</text>
+          </svg>
+          <div class="practice">
+            <span class="practice-label">Best practice</span>
+            <ul>
+              <li><code>repo:read</code> vs <code>repo:write</code>, scopes segregados.</li>
+              <li>Tokens de vida corta (TTL &lt; 15 min), generados just-in-time.</li>
+              <li>Revoca el token al terminar la ejecución.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <span class="footer-left">@katsi</span>
+        <span class="footer-right">04 / 08</span>
+      </div>
+    </div>
+
+    <!-- Slide 5: Tower photo -->
+    <div class="slide photo">
+      <img src="img/tower2.jpg" class="photo" alt="Slide 5">
+      <div class="scrim"></div>
+      <div class="content">
+        <div class="glass">
+          <span class="kicker">PASO 4 · ZERO TRUST MULTIAGENTE</span>
+          <h2>Delegar no es confiar. Asegura las fronteras.</h2>
+          <p class="body">En un enjambre de agentes, tratar los mensajes de un sub-agente como confiables es una vulnerabilidad crítica.</p>
+          <div class="practice">
+            <span class="practice-label">Best practice</span>
+            <ul>
+              <li>Valida cada payload inter-agente con <code>Pydantic</code>.</li>
+              <li>Un agente investigador ni siquiera debe conocer <code>delete_database</code>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <span class="footer-left">@katsi</span>
+        <span class="footer-right">05 / 08</span>
+      </div>
+    </div>
+
+    <!-- Slide 6: Street photo -->
+    <div class="slide photo">
+      <img src="img/street2.jpg" class="photo" alt="Slide 6">
+      <div class="scrim"></div>
+      <div class="content">
+        <div class="glass">
+          <span class="kicker">PASO 5 · HUMAN IN THE LOOP ROBUSTO</span>
+          <h2>Exige fricción controlada antes de la acción sensible.</h2>
+          <p class="body">Automatización total es inaceptable para acciones destructivas, financieras o que toquen datos personales.</p>
+          <div class="practice">
+            <span class="practice-label">Best practice</span>
+            <ul>
+              <li>Propuesta → aprobación → ejecución. El agente solo devuelve el plan.</li>
+              <li><code>idempotency_key</code> en cada acción, con rollback definido.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <span class="footer-left">@katsi</span>
+        <span class="footer-right">06 / 08</span>
+      </div>
+    </div>
+
+    <!-- Slide 7: Stadium photo -->
+    <div class="slide photo">
+      <img src="img/stadium2.jpg" class="photo" alt="Slide 7">
+      <div class="scrim"></div>
+      <div class="content">
+        <div class="glass">
+          <span class="kicker">PASO 6 · MINIMIZACIÓN DE DATOS CON KATSI</span>
+          <h2>La mejor defensa es menos contexto.</h2>
+          <p class="body">No subas todo tu workspace a un LLM en la nube. katsi es un MCP local-first: recupera solo los fragmentos relacionales necesarios (decisiones, convenciones, bugs), tus datos no salen de tu máquina.</p>
+          <span class="action">github.com/jeanethS/katsi</span>
+        </div>
+      </div>
+      <div class="footer">
+        <span class="footer-left">@katsi</span>
+        <span class="footer-right">07 / 08</span>
+      </div>
+    </div>
+
+    <!-- Slide 8: Closing checklist -->
+    <div class="slide text-only">
+      <div class="aura"></div>
+      <div class="content">
+        <div class="glass">
+          <span class="kicker">GUÁRDALO PARA TU PRÓXIMO AGENTE</span>
+          <h2>Cada capability nueva necesita un control nuevo.</h2>
+          <p class="body-main">Diseña los permisos antes de escribir los prompts.</p>
+          <ul class="checklist">
+            <li>Cada tool tiene validación de esquema y nivel de riesgo.</li>
+            <li>Las credenciales son de corta duración y con scope mínimo.</li>
+            <li>Las acciones de alto riesgo piden confirmación con idempotency_key.</li>
+            <li>El contexto sensible se gestiona local-first, con katsi.</li>
+          </ul>
+          <p class="cta">¿Qué control le falta hoy a tu agente?</p>
+        </div>
+      </div>
+      <div class="footer">
+        <span class="footer-left">@katsi</span>
+        <span class="footer-right">08 / 08</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
