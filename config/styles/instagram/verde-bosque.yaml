@@ -1,0 +1,44 @@
+theme:
+  backgroundColor: "#0e130f"   # verde-negro casi sólido (fondo página 3, sin foto)
+  accentColor: "#3f5c46"       # verde musgo medio, tono de las hojas iluminadas
+  textColor: "#ffffff"         # headline en blanco puro
+  mutedTextColor: "#d9d9d9"    # texto secundario/body, blanco ligeramente apagado
+
+overlayOpacity: 0.45             # overlay oscuro sobre las fotos de hojas (páginas 1,2,4,5)
+
+fallbackGradients:
+  - "linear-gradient(135deg, #0a0f0b 0%, #1c2b1f 50%, #3f5c46 100%)"
+  - "linear-gradient(135deg, #000000 0%, #14201a 50%, #2e4433 100%)"
+
+fontFamily: "Playfair Display, system-ui, -apple-system, sans-serif"
+
+slide:
+  width: 1200
+  height: 1200
+  padding: 64
+
+typography:
+  headline:
+    fontSize: 64
+    fontWeight: 700
+    lineHeight: 1.1
+    color: "#ffffff"
+  bodyText:
+    fontSize: 16
+    fontWeight: 400
+    lineHeight: 1.5
+    color: "#d9d9d9"
+  dataPoint:
+    fontSize: 96
+    fontWeight: 800
+    lineHeight: 1.0
+    color: "#ffffff"
+  visualCue:
+    fontSize: 14
+    fontWeight: 600
+    lineHeight: 1.2
+    color: "#ffffff"
+  footer:
+    fontSize: 13
+    fontWeight: 400
+    color: "#d9d9d9"
