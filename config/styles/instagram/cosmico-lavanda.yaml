@@ -1,0 +1,49 @@
+theme:
+  backgroundColor: "#08050f"   # color de fondo principal del template
+  accentColor: "#8f7bff"       # color de acento (CTAs, números, highlights)
+  textColor: "#e9e4ff"         # color del texto principal (headline)
+  mutedTextColor: "#b3a8dd"    # color del texto secundario (body/footer)
+
+overlayOpacity: 0.35
+
+fallbackGradients:
+  - "linear-gradient(135deg, #08050f 0%, #241a4d 50%, #6a4fc7 100%)"
+  - "linear-gradient(135deg, #0a0518 0%, #3b2a80 50%, #a78bfa 100%)"
+
+fontFamily: "Didot, Bodoni Moda, system-ui, -apple-system, sans-serif"
+
+slide:
+  width: 1200
+  height: 1200
+  padding: 90
+
+typography:
+  headline:
+    fontSize: 96
+    fontWeight: 400
+    lineHeight: 1.0
+    color: "#f2effc"
+  bodyText:
+    fontSize: 24
+    fontWeight: 400
+    lineHeight: 1.4
+    color: "#b3a8dd"
+  dataPoint:
+    fontSize: 72
+    fontWeight: 800
+    lineHeight: 1.0
+    color: "#a78bfa"
+  visualCue:
+    fontSize: 20
+    fontWeight: 600
+    lineHeight: 1.2
+    color: "#c9bfff"
+  footer:
+    fontSize: 16
+    fontWeight: 400
+    color: "#8a7fb0"
+
+# NOTA: template original tenía una foto de mano recortada como elemento
+# central (reaching hand, cosmic mood). El renderer actual (InstagramSlide)
+# no soporta cutouts fotográficos superpuestos — este archivo solo captura
+# fondo/tipografía. Ver conversación 2026-08-21 si se agrega soporte.

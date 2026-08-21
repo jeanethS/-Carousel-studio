@@ -1,0 +1,48 @@
+theme:
+  backgroundColor: "#0a0a0a"
+  accentColor: "#c9c9c9"
+  textColor: "#ffffff"
+  mutedTextColor: "#b3b3b3"
+
+overlayOpacity: 0
+
+fallbackGradients:
+  - "linear-gradient(135deg, #1a1a1a 0%, #4d4d4d 50%, #e0e0e0 100%)"
+  - "linear-gradient(135deg, #000000 0%, #3a3a3a 50%, #cfcfcf 100%)"
+
+fontFamily: "Poppins, system-ui, -apple-system, sans-serif"
+
+slide:
+  width: 1200
+  height: 1200
+  padding: 64
+
+typography:
+  headline:
+    fontSize: 64
+    fontWeight: 800
+    lineHeight: 1.1
+    color: "#ffffff"
+  bodyText:
+    fontSize: 20
+    fontWeight: 400
+    lineHeight: 1.4
+    color: "#e6e6e6"
+  dataPoint:
+    fontSize: 96
+    fontWeight: 800
+    lineHeight: 1.0
+    color: "#ffffff"
+  visualCue:
+    fontSize: 16
+    fontWeight: 600
+    lineHeight: 1.2
+    color: "#c9c9c9"
+  footer:
+    fontSize: 14
+    fontWeight: 400
+    color: "#999999"
+
+# NOTA: template original tenía un render 3D chrome-liquid-metal como fondo
+# superpuesto y layout split (texto izquierda / gráfico derecha). El
+# renderer actual no soporta esa composición, solo captura fondo/tipografía.
