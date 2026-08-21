@@ -1,0 +1,45 @@
+theme:
+  backgroundColor: "#0A0A0A"   # color de fondo principal del template
+  accentColor: "#C9A876"       # color de acento (CTAs, números, highlights)
+  textColor: "#F5F3EF"         # color del texto principal (headline)
+  mutedTextColor: "#B8B3AC"    # color del texto secundario (body/footer)
+
+overlayOpacity: 0.4            # overlay oscuro sobre foto (foto texturizada con capa negra)
+
+fallbackGradients:              # 2-3 gradientes CSS que capturen la paleta
+  - "linear-gradient(135deg, #0A0A0A 0%, #1C1A18 50%, #0A0A0A 100%)"
+  - "linear-gradient(135deg, #1C1A18 0%, #3A332C 50%, #0A0A0A 100%)"
+
+fontFamily: "Playfair Display, system-ui, -apple-system, sans-serif"
+                                 # display serif de alto contraste, itálica en logotipo
+
+slide:
+  width: 1200
+  height: 1200                  # instagram cuadrado (formato 4:5 mostrado en canvas, base 1200x1200)
+  padding: 48                   # margen interno estimado
+
+typography:
+  headline:
+    fontSize: 64
+    fontWeight: 400
+    lineHeight: 1.1
+    color: "#F5F3EF"
+  bodyText:
+    fontSize: 20
+    fontWeight: 400
+    lineHeight: 1.4
+    color: "#E5E1DA"
+  dataPoint:
+    fontSize: 56
+    fontWeight: 800
+    lineHeight: 1.0
+    color: "#F5F3EF"
+  visualCue:
+    fontSize: 18
+    fontWeight: 600
+    lineHeight: 1.2
+    color: "#C9A876"
+  footer:
+    fontSize: 13
+    fontWeight: 400
+    color: "#B8B3AC"

@@ -1,0 +1,44 @@
+theme:
+  backgroundColor: "#0a0a0a"   # color de fondo principal del template
+  accentColor: "#e14a2b"       # color de acento (CTAs, números, highlights)
+  textColor: "#e14a2b"         # color del texto principal (headline)
+  mutedTextColor: "#c9c9c9"    # color del texto secundario (body/footer)
+
+overlayOpacity: 0.3
+
+fallbackGradients:
+  - "linear-gradient(135deg, #0a0a0a 0%, #2a2a2a 50%, #0a0a0a 100%)"
+  - "linear-gradient(135deg, #b7c6d1 0%, #dfe6ea 50%, #f2ede4 100%)"
+
+fontFamily: "Didot, 'Bodoni MT', system-ui, -apple-system, sans-serif"
+
+slide:
+  width: 1200
+  height: 1200
+  padding: 48
+
+typography:
+  headline:
+    fontSize: 96
+    fontWeight: 700
+    lineHeight: 1.0
+    color: "#e14a2b"
+  bodyText:
+    fontSize: 18
+    fontWeight: 400
+    lineHeight: 1.4
+    color: "#c9c9c9"
+  dataPoint:
+    fontSize: 64
+    fontWeight: 800
+    lineHeight: 1.0
+    color: "#e14a2b"
+  visualCue:
+    fontSize: 16
+    fontWeight: 600
+    lineHeight: 1.2
+    color: "#e14a2b"
+  footer:
+    fontSize: 20
+    fontWeight: 400
+    color: "#e14a2b"

@@ -1,0 +1,44 @@
+theme:
+  backgroundColor: "#9DAAC8"
+  accentColor: "#01FFFF"
+  textColor: "#FFFFFF"
+  mutedTextColor: "#000000"
+
+overlayOpacity: 0.3
+
+fallbackGradients:
+  - "linear-gradient(135deg, #FF9ECF 0%, #B6A8FF 50%, #7FE8E0 100%)"
+  - "linear-gradient(135deg, #FFE07F 0%, #FF9ECF 50%, #9DAAC8 100%)"
+
+fontFamily: "Kare, system-ui, -apple-system, sans-serif"
+
+slide:
+  width: 1200
+  height: 1200
+  padding: 48
+
+typography:
+  headline:
+    fontSize: 80
+    fontWeight: 700
+    lineHeight: 1.1
+    color: "#FFFFFF"
+  bodyText:
+    fontSize: 28
+    fontWeight: 400
+    lineHeight: 1.4
+    color: "#FFFFFF"
+  dataPoint:
+    fontSize: 96
+    fontWeight: 800
+    lineHeight: 1.0
+    color: "#FFFFFF"
+  visualCue:
+    fontSize: 24
+    fontWeight: 600
+    lineHeight: 1.2
+    color: "#01FFFF"
+  footer:
+    fontSize: 18
+    fontWeight: 400
+    color: "#000000"
