@@ -58,6 +58,12 @@ const FIXTURE: any = {
   handleOrProfile: '@aihealth',
 };
 
+const LINKEDIN_FIXTURE: any = {
+  ...FIXTURE,
+  jobId: 'int-test-002',
+  platform: 'linkedin',
+};
+
 describe('Integration: full carousel pipeline', () => {
   const outputDir = path.join(process.cwd(), 'output', `${FIXTURE.platform}_${FIXTURE.jobId}`);
 
@@ -92,5 +98,28 @@ describe('Integration: full carousel pipeline', () => {
     const files = fs.readdirSync(outputDir);
     const pngFiles = files.filter((f) => f.endsWith('.png'));
     expect(pngFiles.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('Integration: linkedin platform uses its own template + config', () => {
+  const outputDir = path.join(process.cwd(), 'output', `${LINKEDIN_FIXTURE.platform}_${LINKEDIN_FIXTURE.jobId}`);
+
+  beforeAll(async () => {
+    if (fs.existsSync(outputDir)) {
+      fs.rmSync(outputDir, { recursive: true });
+    }
+  });
+
+  it('produces PNG slides sized per the linkedin config (not instagram)', async () => {
+    await bootstrapCarouselStudio(LINKEDIN_FIXTURE as any);
+
+    for (const slide of LINKEDIN_FIXTURE.slides) {
+      const slidePath = path.join(
+        outputDir,
+        `slide_${String(slide.slideNumber).padStart(2, '0')}.png`
+      );
+      expect(fs.existsSync(slidePath)).toBe(true);
+      expect(fs.statSync(slidePath).size).toBeGreaterThan(0);
+    }
   });
 });

@@ -7,8 +7,10 @@ import { findBestPhotoForTopic } from './photos/matcher';
 import { renderTemplateToSvg } from './render/satori';
 import { rasterizeSvgToPng } from './render/sharp';
 import { InstagramSlide } from './templates/instagram/slide';
+import { LinkedInSlide } from './templates/linkedin/slide';
 import { ReactNode } from 'react';
 import { RoutedJobEventSchema, type CarouselSlide, type RoutedJobEvent } from './contracts/routed_job';
+import { resolveConfigPath } from './config/resolveConfigPath';
 
 // Types re-exported from the validated contract (single source of truth).
 export type { CarouselSlide, RoutedJobEvent };
@@ -121,10 +123,11 @@ export async function bootstrapCarouselStudio(job: RoutedJobEvent): Promise<void
   }
   logStage(parsed.jobId, 'matcher', 'ok', { bestPhoto: bestPhoto ?? null });
 
-  // Load Instagram design tokens (gradient fallback config)
-  const igConfigPath = path.join(process.cwd(), 'config', 'ig-design.yaml');
-  const igConfigRaw = await fs.promises.readFile(igConfigPath, 'utf8');
-  const igConfig = yaml.parse(igConfigRaw) as any;
+  // Load platform-appropriate design tokens (style selectable via CAROUSEL_STYLE)
+  const style = process.env.CAROUSEL_STYLE;
+  const configPath = resolveConfigPath(parsed.platform, style);
+  const configRaw = await fs.promises.readFile(configPath, 'utf8');
+  const config = yaml.parse(configRaw) as any;
 
   const heroImageUrl = bestPhoto ?? undefined;
   const fallbackGradientIndex = heroImageUrl == null ? 0 : undefined; // use first gradient if no hero
@@ -138,15 +141,21 @@ export async function bootstrapCarouselStudio(job: RoutedJobEvent): Promise<void
 
   // Process each slide sequentially (could be parallelized later)
   for (const slide of parsed.slides) {
+    const slideElement =
+      parsed.platform === 'instagram' ? (
+        <InstagramSlide
+          config={config}
+          slide={slide}
+          heroImageUrl={heroImageUrl}
+          fallbackGradientIndex={fallbackGradientIndex}
+        />
+      ) : (
+        <LinkedInSlide config={config} slide={slide} />
+      );
+
     const svg = await renderTemplateToSvg(
-      // JSX element
-      <InstagramSlide
-        config={igConfig}
-        slide={slide}
-        heroImageUrl={heroImageUrl}
-        fallbackGradientIndex={fallbackGradientIndex}
-      />,
-      { width: igConfig.slide.width, height: igConfig.slide.height }
+      slideElement,
+      { width: config.slide.width, height: config.slide.height }
     );
 
     const outputPath = path.join(outputDir, `slide_${String(slide.slideNumber).padStart(2, '0')}.png`);
