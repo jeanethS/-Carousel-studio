@@ -148,6 +148,7 @@ export async function bootstrapCarouselStudio(job: RoutedJobEvent): Promise<void
           slide={slide}
           heroImageUrl={heroImageUrl}
           fallbackGradientIndex={fallbackGradientIndex}
+          overlayGraphic={slide.overlayGraphic}
         />
       ) : (
         <LinkedInSlide config={config} slide={slide} />

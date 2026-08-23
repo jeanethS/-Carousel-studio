@@ -14,6 +14,14 @@ export const CarouselSlideSchema = z.object({
   bodyText: z.string().optional(),
   dataPoint: z.string().optional(),
   visualCue: z.string().optional(),
+  overlayGraphic: z.object({
+    url: z.string().min(1),
+    x: z.number().optional(),
+    y: z.number().optional(),
+    width: z.number().optional(),
+    height: z.number().optional(),
+    opacity: z.number().min(0).max(1).optional(),
+  }).optional(),
 });
 
 export const RoutedJobEventSchema = z.object({

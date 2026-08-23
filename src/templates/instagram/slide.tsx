@@ -40,6 +40,15 @@ export interface InstagramSlideData {
   visualCue?: string;
 }
 
+export interface InstagramOverlayGraphic {
+  url: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  opacity?: number;
+}
+
 export interface InstagramSlideProps {
   /** Design tokens from config/ig-design.yaml */
   config: InstagramDesignTokens;
@@ -49,6 +58,8 @@ export interface InstagramSlideProps {
   heroImageUrl?: string;
   /** Index of the fallback gradient to use when no heroImageUrl is provided */
   fallbackGradientIndex?: number;
+  /** Optional supplementary image/graphic layered above the hero image, below content */
+  overlayGraphic?: InstagramOverlayGraphic;
 }
 
 // ── Inline styles (used directly in Satori-compatible JSX) ────────────────────
@@ -66,6 +77,13 @@ const overlayBase: React.CSSProperties = {
   left: 0,
   right: 0,
   bottom: 0,
+};
+
+const overlayGraphicBase: React.CSSProperties = {
+  position: 'absolute',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  zIndex: 0,
 };
 
 const contentBase: React.CSSProperties = {
@@ -90,6 +108,7 @@ export function InstagramSlide({
   slide,
   heroImageUrl,
   fallbackGradientIndex = 0,
+  overlayGraphic,
 }: InstagramSlideProps) {
   const { theme, typography, slide: slideLayout, overlayOpacity, fontFamily } = config;
   const { headline, bodyText, dataPoint, visualCue } = slide;
@@ -126,6 +145,28 @@ export function InstagramSlide({
     >
       {/* Gradient or image overlay */}
       {heroImageUrl && <div style={overlay} />}
+
+      {/* Overlay graphic (supplementary image/logo/badge) */}
+      {overlayGraphic && (
+        <div
+          style={{
+            ...overlayGraphicBase,
+            ...(overlayGraphic.x !== undefined &&
+            overlayGraphic.y !== undefined &&
+            overlayGraphic.width !== undefined &&
+            overlayGraphic.height !== undefined
+              ? {
+                  top: overlayGraphic.y,
+                  left: overlayGraphic.x,
+                  width: overlayGraphic.width,
+                  height: overlayGraphic.height,
+                }
+              : { top: 0, left: 0, right: 0, bottom: 0 }),
+            backgroundImage: `url(${overlayGraphic.url})`,
+            opacity: overlayGraphic.opacity ?? 1,
+          }}
+        />
+      )}
 
       {/* Content area */}
       <div

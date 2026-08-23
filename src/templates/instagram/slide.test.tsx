@@ -125,4 +125,44 @@ describe('InstagramSlide', () => {
     expect(html).toContain('#1a1a2e');
     expect(html).toMatchSnapshot('gradient-fallback');
   });
+
+  it('renders full-bleed overlay graphic when no positioning provided', () => {
+    const html = renderToString(
+      <InstagramSlide
+        config={sampleConfig}
+        slide={sampleSlide}
+        overlayGraphic={{ url: 'https://example.com/overlay.png' }}
+      />
+    );
+    expect(html).toContain('overlay.png');
+    expect(html).toMatchSnapshot('overlay-graphic-full-bleed');
+  });
+
+  it('renders positioned overlay graphic when x/y/width/height provided', () => {
+    const html = renderToString(
+      <InstagramSlide
+        config={sampleConfig}
+        slide={sampleSlide}
+        overlayGraphic={{
+          url: 'https://example.com/badge.png',
+          x: 100,
+          y: 200,
+          width: 300,
+          height: 150,
+          opacity: 0.8,
+        }}
+      />
+    );
+    expect(html).toContain('badge.png');
+    expect(html).toMatchSnapshot('overlay-graphic-positioned');
+  });
+
+  it('renders without overlay graphic layer when prop is absent', () => {
+    const html = renderToString(
+      <InstagramSlide config={sampleConfig} slide={sampleSlide} />
+    );
+    expect(html).not.toContain('overlay.png');
+    expect(html).not.toContain('badge.png');
+    expect(html).toMatchSnapshot('no-overlay-graphic');
+  });
 });
