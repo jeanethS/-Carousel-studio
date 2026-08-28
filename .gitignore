@@ -22,3 +22,6 @@ gcp-service-account*.json
 *service-account*.json
 *-sa.json
 *.key
+
+# Generated carousel output
+content/china-ruta-2026/
