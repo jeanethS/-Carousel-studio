@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { readdir, stat } from 'fs/promises';
 import { join, extname } from 'path';
+import { assetsDir } from '../utils/paths';
 
 const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp']);
 
@@ -13,13 +14,13 @@ export async function findBestPhotoForTopic(topic: string): Promise<string | nul
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-  const watchedUploadsDir = join(process.cwd(), 'src', 'photos', 'watched_uploads');
+  const picturesDir = assetsDir();
   let files: string[];
   try {
-    const entries = await readdir(watchedUploadsDir);
+    const entries = await readdir(picturesDir);
     files = await Promise.all(
       entries.map(async (entry) => {
-        const fullPath = join(watchedUploadsDir, entry);
+        const fullPath = join(picturesDir, entry);
         const stats = await stat(fullPath);
         return stats.isFile() ? fullPath : null;
       })

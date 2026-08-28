@@ -10,7 +10,7 @@ const { readdir, stat, readFile } = require('fs/promises');
 
 describe('findBestPhotoForTopic', () => {
   const topic = 'test topic';
-  const watchedUploadsDir = join(process.cwd(), 'src', 'photos', 'watched_uploads');
+  const watchedUploadsDir = join(process.cwd(), 'assets');
 
   beforeEach(() => {
     jest.clearAllMocks();

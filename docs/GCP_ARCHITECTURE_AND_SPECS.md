@@ -43,7 +43,7 @@ No crear nuevas keys de service account. La versión `auradev-sa` existente es c
 2. Copia sólo `package.json` y usa `npm ci`, que requiere lockfile.
 3. El CMD ejecuta `task:orchestrator`, que depende de `ts-node` (devDependency) incluso después de compilar.
 4. `@brand-os/contracts` usa `file:../brand-os-infra/contracts`, fuera del contexto Docker normal.
-5. Inputs se buscan en `src/photos/watched_uploads` y outputs se escriben a `output/`; ambos son locales/efímeros.
+5. Inputs se buscan en `assets/` (override `ASSETS_DIR`) y outputs se escriben a `output/` (override `OUTPUT_DIR`); ambos son locales/efímeros.
 6. El matcher hace una llamada Gemini por imagen sin cap de cantidad/tamaño.
 
 ### 4.2 Variables objetivo

@@ -1,10 +1,11 @@
 /**
  * task:sharp — Sharp rasteriser standalone runner.
- * Reads tmp/sample.svg and writes tmp/sample.png.
+ * Reads output/sample.svg and writes output/sample.png.
  */
 import * as fs from 'fs';
 import * as path from 'path';
 import { rasterizeSvgToPng } from '../render/sharp';
+import { outputDir } from '../utils/paths';
 
 function logStage(jobId: string, stage: string, status: 'start' | 'ok' | 'error', extra: Record<string, any> = {}): void {
   console.log(JSON.stringify({
@@ -18,15 +19,15 @@ function logStage(jobId: string, stage: string, status: 'start' | 'ok' | 'error'
 
 async function main() {
   const jobId = 'task-sharp';
-  const tmpDir = path.join(process.cwd(), 'tmp');
-  const inputPath = path.join(tmpDir, 'sample.svg');
-  const outputPath = path.join(tmpDir, 'sample.png');
+  const outDir = outputDir();
+  const inputPath = path.join(outDir, 'sample.svg');
+  const outputPath = path.join(outDir, 'sample.png');
 
   logStage(jobId, 'sharp', 'start');
 
   if (!fs.existsSync(inputPath)) {
     console.error(`Input file not found: ${inputPath}`);
-    console.error('Run task:satori first to generate tmp/sample.svg');
+    console.error('Run task:satori first to generate output/sample.svg');
     logStage(jobId, 'sharp', 'error', { error: 'sample.svg not found' });
     process.exit(1);
   }

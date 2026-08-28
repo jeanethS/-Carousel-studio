@@ -1,10 +1,11 @@
 /**
  * task:satori — Satori renderer standalone runner.
- * Renders a sample JSX element to SVG and writes tmp/sample.svg.
+ * Renders a sample JSX element to SVG and writes output/sample.svg.
  */
 import * as fs from 'fs';
 import * as path from 'path';
 import { renderTemplateToSvg } from '../render/satori';
+import { outputDir } from '../utils/paths';
 
 function logStage(jobId: string, stage: string, status: 'start' | 'ok' | 'error', extra: Record<string, any> = {}): void {
   console.log(JSON.stringify({
@@ -46,12 +47,12 @@ async function main() {
   try {
     const svg = await renderTemplateToSvg(sampleElement as any, { width: 1200, height: 1200 });
 
-    const tmpDir = path.join(process.cwd(), 'tmp');
-    if (!fs.existsSync(tmpDir)) {
-      fs.mkdirSync(tmpDir, { recursive: true });
+    const outDir = outputDir();
+    if (!fs.existsSync(outDir)) {
+      fs.mkdirSync(outDir, { recursive: true });
     }
 
-    const outputPath = path.join(tmpDir, 'sample.svg');
+    const outputPath = path.join(outDir, 'sample.svg');
     fs.writeFileSync(outputPath, svg, 'utf8');
 
     logStage(jobId, 'satori', 'ok', { outputPath, svgLength: svg.length });

@@ -1,6 +1,6 @@
 /**
  * task:matcher — Gemini Vision Matcher standalone runner.
- * Runs findBestPhotoForTopic against the watched_uploads directory.
+ * Runs findBestPhotoForTopic against the assets directory.
  */
 import { findBestPhotoForTopic } from '../photos/matcher';
 
